@@ -1,0 +1,26 @@
+# Generated numerical inputs and outputs. Keep the exchange directories.
+/AmplInputs/*
+!/AmplInputs/.gitkeep
+/AmplResults/*
+!/AmplResults/.gitkeep
+*.asv
+*.m~
+*.nl
+*.sol
+
+# Do not publish readable sources of protected initialization functions.
+# The release directory contains only their same-named .p files.
+/SearchHybridAStarPath.m
+/SearchInitialTrajectory.m
+/ResamplePath.m
+/ParkingStateValidator.m
+/IsVehiclePoseValid.m
+
+# Figures are displayed interactively; historical exports are not source code.
+*.fig
+*.tif
+*.tiff
+*.png
+*.gif
+*.avi
+*.mp4

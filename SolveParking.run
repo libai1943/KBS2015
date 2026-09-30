@@ -1,0 +1,21 @@
+reset;
+model NLP.mod;
+include AmplInputs/InitialGuess.INIVAL;
+option solver './ipopt.exe';
+solve;
+
+# Status is always exported, including an unsuccessful optimization.
+printf "%d\n", solve_result_num > "AmplResults/solve_result_num.txt";
+close "AmplResults/solve_result_num.txt";
+printf "%s\n", solve_result > "AmplResults/solve_result.txt";
+close "AmplResults/solve_result.txt";
+if solve_result_num >= 0 and solve_result_num < 100 then {
+    printf {i in 1..nfe} "%.17g\n", x[i] > "AmplResults/x.txt";
+    printf {i in 1..nfe} "%.17g\n", y[i] > "AmplResults/y.txt";
+    printf {i in 1..nfe} "%.17g\n", theta[i] > "AmplResults/theta.txt";
+    printf {i in 1..nfe} "%.17g\n", v[i] > "AmplResults/v.txt";
+    printf {i in 1..nfe} "%.17g\n", a[i] > "AmplResults/a.txt";
+    printf {i in 1..nfe} "%.17g\n", phy[i] > "AmplResults/phy.txt";
+    printf {i in 1..nfe} "%.17g\n", w[i] > "AmplResults/w.txt";
+    printf "%.17g\n", tf > "AmplResults/terminal_time.txt";
+}
