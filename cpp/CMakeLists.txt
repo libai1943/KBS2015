@@ -1,0 +1,27 @@
+# Requires the CasADi C++ SDK (including IPOPT).
+# cmake -S cpp -B cpp/build -Dcasadi_DIR=<casadi>/cmake
+# cmake --build cpp/build --config Release
+# Run kbs_demo with the CasADi shared-library directory on PATH/LD_LIBRARY_PATH.
+cmake_minimum_required(VERSION 3.16)
+project(kbs_parking LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+find_package(casadi CONFIG REQUIRED)
+add_library(rigid_search SHARED IMPORTED)
+if(WIN32)
+  set_target_properties(rigid_search PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/windows-x86_64/rigid_search.dll" IMPORTED_IMPLIB "${CMAKE_CURRENT_SOURCE_DIR}/lib/windows-x86_64/librigid_search.dll.a")
+else()
+  set_target_properties(rigid_search PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/lib/linux-x86_64/librigid_search.so")
+endif()
+add_executable(kbs_demo src/main.cpp)
+target_link_libraries(kbs_demo PRIVATE casadi::casadi rigid_search)
+target_compile_definitions(kbs_demo PRIVATE PARKING_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+if(MINGW)
+  target_link_options(kbs_demo PRIVATE -static-libgcc -static-libstdc++)
+endif()
+if(WIN32)
+  add_custom_command(TARGET kbs_demo POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:rigid_search> $<TARGET_FILE_DIR:kbs_demo>)
+endif()
+enable_testing()
+add_test(NAME original_parking_case COMMAND kbs_demo --output validation)
