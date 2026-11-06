@@ -1,5 +1,7 @@
 # KBS2015 · 第二章自主泊车轨迹规划配套代码
 
+[下载 ZIP](https://github.com/libai1943/KBS2015/archive/refs/heads/main.zip) · [从这里开始](#一键运行) · [阅读指南](#matlab-文件功能) · [引用](#使用与引用)
+
 本仓库是**中文图书《非结构化场景自动驾驶轨迹规划技术》**第二章的配套代码。
 
 - **中文书名**：《非结构化场景自动驾驶轨迹规划技术》
@@ -58,6 +60,20 @@ result = RunParkingDemo(case_id);
 | `initial_guess` | HA* 路径构造的初始状态与控制量 |
 | `solve_result_num` | AMPL 求解状态码 |
 | `validation`, `timing`, `case_id` | 离散结果检查、计算耗时与算例编号 |
+
+## 在 C++ 中复算第 3 个场景
+
+仓库还提供 [C++17 实现](cpp/src/main.cpp)。该程序内置 MATLAB 第 3 例的起终位姿和两个矩形障碍物，调用随附搜索库生成路径，再以 200 个配置点求解最短时间问题。若要切换四个算例或查看交互图，请使用上文的 MATLAB 入口。
+
+下面以 Linux x86-64 单配置构建为例。准备 CMake 3.16 或更高版本，以及含 IPOPT 插件的 CasADi C++ SDK；将 `casadi_DIR` 指向其 CMake 配置目录，并让系统可以找到 CasADi 的动态库。
+
+```sh
+cmake -S cpp -B cpp/build -Dcasadi_DIR=/path/to/casadi/cmake
+cmake --build cpp/build --config Release
+./cpp/build/kbs_demo --output results/cpp_case3
+```
+
+默认线性求解器为 MUMPS。求解成功且最大约束违反量不超过 `1e-5` 时，程序写入 `results/cpp_case3/trajectory.csv`。列 `t,x,y,theta,v,a,phi,omega` 分别记录时间、后轴位置、航向、速度、加速度、转角和转角速率。比较两个实现时，请将 MATLAB 的 `case_id` 也设为 3，并记录各自的线性求解器。
 
 ## 总体架构
 
